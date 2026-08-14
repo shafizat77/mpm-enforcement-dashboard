@@ -163,10 +163,28 @@ body.admin .admin-only{display:inline-flex}
 .search-row{grid-template-columns:1fr}
 .auth-area .user-badge{display:none}
 }
+@media(max-width:768px){
+  .sidebar-brand{height:88px;padding:8px 12px}
+  .sidebar-brand-logo{width:60px;height:60px;min-width:60px}
+  .sidebar-brand-name .brand-small{font-size:10px}
+  .sidebar-brand-name .brand-large{font-size:19px}
+}
+
 @media(max-width:430px){
 .kpi-grid{grid-template-columns:1fr}
 .kpi{min-height:105px}
 }
+
+/* BRANDING MPM */
+.sidebar-brand{height:96px;padding:10px 14px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px;justify-content:flex-start;overflow:hidden}
+.sidebar-brand-logo{width:68px;height:68px;min-width:68px;border:1px dashed #9ca3af;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;transition:.2s}
+.sidebar-brand-logo img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.sidebar-brand-logo .logo-placeholder{font-size:10px;line-height:1.2;text-align:center;color:#64748b;font-weight:700}
+.sidebar-brand-name{display:flex;flex-direction:column;justify-content:center;line-height:1.02;min-width:0;user-select:none}
+.sidebar-brand-name .brand-small{font-size:11px;font-weight:700;color:#111827;letter-spacing:.1px;white-space:nowrap}
+.sidebar-brand-name .brand-large{font-size:22px;font-weight:900;color:#000;letter-spacing:-.4px;white-space:nowrap}
+.brand-settings-btn{display:none;margin-left:auto;position:absolute;right:8px;top:7px;border:0;background:#123b5d;color:#fff;border-radius:6px;padding:4px 7px;font-size:11px;font-weight:700;z-index:4}
+body.admin .brand-settings-btn{display:block}
 
 /* LOGO MAJLIS - ADMIN SAHAJA */
 .logo-admin-only{cursor:default;position:relative}
@@ -179,13 +197,17 @@ body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
 <body>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-brand">
-    <label class="sidebar-brand-logo logo-admin-only" title="Klik untuk pilih logo Majlis">
+  <div class="sidebar-brand" id="mpmBrandArea">
+    <button type="button" class="brand-settings-btn admin-only" onclick="openBrandSettings()" title="Tetapan logo dan teks">⚙</button>
+    <label class="sidebar-brand-logo logo-admin-only" title="Klik untuk tetapan logo Majlis" onclick="openBrandSettings()">
       <img id="mpmLogoPreview" src="" alt="Logo Majlis" style="display:none;">
       <span id="mpmLogoPlaceholder" class="logo-placeholder">+<br>LOGO</span>
-      <input id="mpmLogoInput" type="file" accept="image/*" style="display:none;">
+      <input id="mpmLogoInput" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" style="display:none;">
     </label>
-    <div class="sidebar-brand-name">MPM</div>
+    <div class="sidebar-brand-name" id="mpmBrandText">
+      <span class="brand-small" id="mpmBrandTop">MAJLIS PERBANDARAN</span>
+      <span class="brand-large" id="mpmBrandBottom">MANJUNG</span>
+    </div>
   </div>
   <button class="menu-item active" onclick="showPage('dashboard',this)">
     <span class="menu-icon">🏠</span><span>Dashboard</span>
@@ -391,6 +413,58 @@ body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
     </div>
   </section>
 
+</div>
+
+<!-- TETAPAN LOGO & TEKS (ADMIN SAHAJA) -->
+<div class="modal" id="brandSettingsModal">
+  <div class="modal-box" style="width:min(560px,100%);">
+    <div class="modal-head">
+      <h2>Tetapan Logo &amp; Teks (ADMIN)</h2>
+      <button class="close-btn" onclick="closeBrandSettings()">×</button>
+    </div>
+    <div class="admin-panel"><strong>ADMIN SAHAJA</strong> — Tetapan ini hanya boleh diubah selepas login sebagai admin.</div>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Pilih Logo Majlis</label>
+        <input id="brandLogoFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+        <div style="font-size:12px;color:#6b7280;margin-top:6px">PNG, JPG, WEBP atau SVG. Logo akan dipaparkan di bahagian atas menu.</div>
+      </div>
+      <div class="form-group form-full">
+        <label>Saiz Logo</label>
+        <div style="display:grid;grid-template-columns:1fr 80px;gap:10px;align-items:center">
+          <input id="brandLogoSize" type="range" min="40" max="120" step="1" value="68" style="width:100%">
+          <input id="brandLogoSizeNumber" type="number" min="40" max="120" value="68">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Teks Atas</label>
+        <input id="brandTopText" type="text" value="MAJLIS PERBANDARAN">
+      </div>
+      <div class="form-group">
+        <label>Teks Bawah</label>
+        <input id="brandBottomText" type="text" value="MANJUNG">
+      </div>
+      <div class="form-group">
+        <label>Saiz Font Teks Atas</label>
+        <div style="display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center">
+          <input id="brandTopSize" type="range" min="8" max="20" step="1" value="11">
+          <input id="brandTopSizeNumber" type="number" min="8" max="20" value="11">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Saiz Font Teks Bawah</label>
+        <div style="display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center">
+          <input id="brandBottomSize" type="range" min="14" max="40" step="1" value="22">
+          <input id="brandBottomSizeNumber" type="number" min="14" max="40" value="22">
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-light" onclick="resetBrandSettings()">Reset</button>
+      <button class="btn btn-light" onclick="closeBrandSettings()">Batal</button>
+      <button class="btn btn-primary" onclick="saveBrandSettings()">💾 Simpan Perubahan</button>
+    </div>
+  </div>
 </div>
 
 <!-- LOGIN MODAL -->
@@ -1392,60 +1466,175 @@ loadData();
 
 
 <script>
-/* LOGO MAJLIS - UPLOAD & PREVIEW */
+/* =========================================================
+   BRANDING LOGO & TEKS - ADMIN SAHAJA
+   ========================================================= */
 (function(){
   const input = document.getElementById("mpmLogoInput");
   const preview = document.getElementById("mpmLogoPreview");
   const placeholder = document.getElementById("mpmLogoPlaceholder");
-  const STORAGE_KEY = "mpm_logo_data";
+  const fileInput = document.getElementById("brandLogoFile");
+  const STORAGE_KEY = "mpm_branding_settings_v2";
 
-  function showLogo(src){
-    if(!src) return;
-    preview.src = src;
-    preview.style.display = "block";
-    placeholder.style.display = "none";
+  const defaults = {
+    logo:"",
+    logoSize:68,
+    topText:"MAJLIS PERBANDARAN",
+    bottomText:"MANJUNG",
+    topSize:11,
+    bottomSize:22
+  };
+
+  let settings = {...defaults};
+
+  function safeNum(v,min,max,fallback){
+    const n=Number(v);
+    return Number.isFinite(n) ? Math.min(max,Math.max(min,n)) : fallback;
   }
 
-  const savedLogo = localStorage.getItem(STORAGE_KEY);
-  if(savedLogo) showLogo(savedLogo);
+  function applyBranding(){
+    const logoSize=safeNum(settings.logoSize,40,120,68);
+    const topSize=safeNum(settings.topSize,8,20,11);
+    const bottomSize=safeNum(settings.bottomSize,14,40,22);
+
+    const brandLogo=document.querySelector(".sidebar-brand-logo");
+    if(brandLogo){
+      brandLogo.style.width=logoSize+"px";
+      brandLogo.style.height=logoSize+"px";
+      brandLogo.style.minWidth=logoSize+"px";
+    }
+
+    document.getElementById("mpmBrandTop").textContent=settings.topText || "MAJLIS PERBANDARAN";
+    document.getElementById("mpmBrandBottom").textContent=settings.bottomText || "MANJUNG";
+    document.getElementById("mpmBrandTop").style.fontSize=topSize+"px";
+    document.getElementById("mpmBrandBottom").style.fontSize=bottomSize+"px";
+
+    if(settings.logo){
+      preview.src=settings.logo;
+      preview.style.display="block";
+      placeholder.style.display="none";
+    }else{
+      preview.removeAttribute("src");
+      preview.style.display="none";
+      placeholder.style.display="block";
+    }
+  }
+
+  function loadSettings(){
+    try{
+      const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
+      if(saved && typeof saved === "object") settings={...defaults,...saved};
+    }catch(e){
+      settings={...defaults};
+    }
+    applyBranding();
+  }
+
+  function syncControls(){
+    document.getElementById("brandLogoSize").value=settings.logoSize;
+    document.getElementById("brandLogoSizeNumber").value=settings.logoSize;
+    document.getElementById("brandTopText").value=settings.topText;
+    document.getElementById("brandBottomText").value=settings.bottomText;
+    document.getElementById("brandTopSize").value=settings.topSize;
+    document.getElementById("brandTopSizeNumber").value=settings.topSize;
+    document.getElementById("brandBottomSize").value=settings.bottomSize;
+    document.getElementById("brandBottomSizeNumber").value=settings.bottomSize;
+  }
+
+  window.openBrandSettings=function(){
+    if(typeof ensureAdmin === "function" && !ensureAdmin()) return;
+    syncControls();
+    document.getElementById("brandSettingsModal").classList.add("open");
+  };
+
+  window.closeBrandSettings=function(){
+    document.getElementById("brandSettingsModal").classList.remove("open");
+    if(fileInput) fileInput.value="";
+  };
+
+  window.saveBrandSettings=function(){
+    if(typeof ensureAdmin === "function" && !ensureAdmin()) return;
+
+    settings.logoSize=safeNum(document.getElementById("brandLogoSizeNumber").value,40,120,68);
+    settings.topText=document.getElementById("brandTopText").value.trim() || "MAJLIS PERBANDARAN";
+    settings.bottomText=document.getElementById("brandBottomText").value.trim() || "MANJUNG";
+    settings.topSize=safeNum(document.getElementById("brandTopSizeNumber").value,8,20,11);
+    settings.bottomSize=safeNum(document.getElementById("brandBottomSizeNumber").value,14,40,22);
+
+    try{
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));
+      applyBranding();
+      closeBrandSettings();
+      alert("Tetapan logo dan teks berjaya disimpan.");
+    }catch(err){
+      alert("Tetapan tidak dapat disimpan pada pelayar ini.");
+    }
+  };
+
+  window.resetBrandSettings=function(){
+    if(typeof ensureAdmin === "function" && !ensureAdmin()) return;
+    settings={...defaults};
+    try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+    syncControls();
+    applyBranding();
+    if(fileInput) fileInput.value="";
+  };
+
+  function handleFile(file){
+    if(typeof isAdmin !== "undefined" && !isAdmin){
+      alert("Akses admin diperlukan untuk mengubah logo.");
+      return;
+    }
+    if(!file) return;
+    if(!file.type.startsWith("image/")){
+      alert("Sila pilih fail gambar untuk logo.");
+      return;
+    }
+    if(file.size > 2*1024*1024){
+      alert("Saiz fail logo maksimum ialah 2MB.");
+      return;
+    }
+    const reader=new FileReader();
+    reader.onload=function(e){
+      settings.logo=e.target.result;
+      applyBranding();
+    };
+    reader.readAsDataURL(file);
+  }
 
   if(input){
-    input.addEventListener("click", function(e){
-      if(typeof isAdmin !== "undefined" && !isAdmin){
-        e.preventDefault();
-        alert("Akses admin diperlukan untuk mengubah logo.");
-      }
-    });
-
-    input.addEventListener("change", function(){
-      if(typeof isAdmin !== "undefined" && !isAdmin){
-        this.value = "";
-        alert("Akses admin diperlukan untuk mengubah logo.");
-        return;
-      }
-
-      const file = this.files && this.files[0];
-      if(!file) return;
-
-      if(!file.type.startsWith("image/")){
-        alert("Sila pilih fail gambar untuk logo.");
-        this.value = "";
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e){
-        const src = e.target.result;
-        showLogo(src);
-        try{
-          localStorage.setItem(STORAGE_KEY, src);
-        }catch(err){
-          alert("Logo terlalu besar untuk disimpan pada pelayar ini. Sila gunakan fail logo yang lebih kecil.");
-        }
-      };
-      reader.readAsDataURL(file);
+    input.addEventListener("click",function(e){
+      e.preventDefault();
+      if(typeof isAdmin !== "undefined" && isAdmin) openBrandSettings();
+      else alert("Akses admin diperlukan untuk mengubah logo.");
     });
   }
+
+  if(fileInput) fileInput.addEventListener("change",function(){handleFile(this.files && this.files[0]);});
+
+  // Slider <-> number input + live preview
+  const pairs=[
+    ["brandLogoSize","brandLogoSizeNumber",40,120,"logoSize"],
+    ["brandTopSize","brandTopSizeNumber",8,20,"topSize"],
+    ["brandBottomSize","brandBottomSizeNumber",14,40,"bottomSize"]
+  ];
+  pairs.forEach(([rangeId,numId,min,max,key])=>{
+    const range=document.getElementById(rangeId), num=document.getElementById(numId);
+    if(!range || !num) return;
+    range.addEventListener("input",()=>{
+      num.value=range.value;
+      settings[key]=safeNum(range.value,min,max,Number(range.value));
+      applyBranding();
+    });
+    num.addEventListener("input",()=>{
+      const v=safeNum(num.value,min,max,Number(range.value));
+      range.value=v;
+      settings[key]=v;
+      applyBranding();
+    });
+  });
+
+  loadSettings();
 })();
 </script>
 </body>
