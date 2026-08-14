@@ -167,6 +167,12 @@ body.admin .admin-only{display:inline-flex}
 .kpi-grid{grid-template-columns:1fr}
 .kpi{min-height:105px}
 }
+
+/* LOGO MAJLIS - ADMIN SAHAJA */
+.logo-admin-only{cursor:default;position:relative}
+body:not(.admin) .logo-admin-only{pointer-events:none}
+body.admin .logo-admin-only{cursor:pointer;border-style:dashed}
+body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
 </style>
 </head>
 
@@ -174,10 +180,11 @@ body.admin .admin-only{display:inline-flex}
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <div class="sidebar-brand-logo" title="Letak logo Majlis di sini">
-      <img src="logo-mpm.png" alt="Logo Majlis" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-      <span class="logo-placeholder" style="display:none;">LOGO<br>MPM</span>
-    </div>
+    <label class="sidebar-brand-logo logo-admin-only" title="Klik untuk pilih logo Majlis">
+      <img id="mpmLogoPreview" src="" alt="Logo Majlis" style="display:none;">
+      <span id="mpmLogoPlaceholder" class="logo-placeholder">+<br>LOGO</span>
+      <input id="mpmLogoInput" type="file" accept="image/*" style="display:none;">
+    </label>
     <div class="sidebar-brand-name">MPM</div>
   </div>
   <button class="menu-item active" onclick="showPage('dashboard',this)">
@@ -1383,5 +1390,63 @@ initAuth();
 loadData();
 </script>
 
+
+<script>
+/* LOGO MAJLIS - UPLOAD & PREVIEW */
+(function(){
+  const input = document.getElementById("mpmLogoInput");
+  const preview = document.getElementById("mpmLogoPreview");
+  const placeholder = document.getElementById("mpmLogoPlaceholder");
+  const STORAGE_KEY = "mpm_logo_data";
+
+  function showLogo(src){
+    if(!src) return;
+    preview.src = src;
+    preview.style.display = "block";
+    placeholder.style.display = "none";
+  }
+
+  const savedLogo = localStorage.getItem(STORAGE_KEY);
+  if(savedLogo) showLogo(savedLogo);
+
+  if(input){
+    input.addEventListener("click", function(e){
+      if(typeof isAdmin !== "undefined" && !isAdmin){
+        e.preventDefault();
+        alert("Akses admin diperlukan untuk mengubah logo.");
+      }
+    });
+
+    input.addEventListener("change", function(){
+      if(typeof isAdmin !== "undefined" && !isAdmin){
+        this.value = "";
+        alert("Akses admin diperlukan untuk mengubah logo.");
+        return;
+      }
+
+      const file = this.files && this.files[0];
+      if(!file) return;
+
+      if(!file.type.startsWith("image/")){
+        alert("Sila pilih fail gambar untuk logo.");
+        this.value = "";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const src = e.target.result;
+        showLogo(src);
+        try{
+          localStorage.setItem(STORAGE_KEY, src);
+        }catch(err){
+          alert("Logo terlalu besar untuk disimpan pada pelayar ini. Sila gunakan fail logo yang lebih kecil.");
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+})();
+</script>
 </body>
 </html>
