@@ -24,7 +24,135 @@ body {
     background: #f4f6f8;
     color: #1f2937;
 }
+/* =========================
+   SIDEBAR NAVIGATION
+   ========================= */
 
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid #ddd;
+    z-index: 1000;
+    padding-top: 20px;
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 25px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.sidebar-title strong {
+    font-size: 22px;
+    color: #123b5d;
+}
+
+.sidebar-title span {
+    font-size: 13px;
+    color: #777;
+    margin-top: 3px;
+}
+
+.menu-item {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s;
+}
+
+.menu-item:hover {
+    background: #f1f5f9;
+}
+
+.menu-item.active {
+    background: #123b5d;
+    color: white;
+    font-weight: bold;
+}
+
+.menu-item span {
+    flex: 1;
+}
+
+/* =========================
+   MAIN AREA
+   ========================= */
+
+.main-area {
+    margin-left: 250px;
+    min-height: 100vh;
+}
+
+.topbar {
+    height: 70px;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 25px;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.topbar strong {
+    display: block;
+    font-size: 18px;
+    color: #123b5d;
+}
+
+.topbar small {
+    display: block;
+    margin-top: 3px;
+    color: #777;
+}
+
+.menu-toggle {
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+    color: #555;
+}
+
+/* =========================
+   SIDEBAR MOBILE
+   ========================= */
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: 0.25s;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        margin-left: 0;
+    }
+
+}
 .header {
     background: #123b5d;
     color: white;
@@ -192,7 +320,52 @@ th {
 </head>
 
 <body>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
 
+    <div class="sidebar-title">
+        <strong>MPM</strong>
+        <span>Penguatkuasaan</span>
+    </div>
+
+    <button class="menu-item active" onclick="showPage('dashboard', this)">
+        🏠
+        <span>Dashboard</span>
+    </button>
+
+    <button class="menu-item" onclick="showPage('carian', this)">
+        🔎
+        <span>Carian KM</span>
+    </button>
+
+    <button class="menu-item" onclick="showPage('senarai', this)">
+        📋
+        <span>Senarai Rekod KM</span>
+    </button>
+
+    <button class="menu-item" onclick="showPage('peta', this)">
+        🗺️
+        <span>Peta Lokasi</span>
+    </button>
+
+    <button class="menu-item" onclick="showPage('statistik', this)">
+        📊
+        <span>Statistik</span>
+    </button>
+
+</div>
+
+<!-- MAIN AREA -->
+<div class="main-area">
+
+    <div class="topbar">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+        <div>
+            <strong>Dashboard Penguatkuasaan</strong>
+            <small>Majlis Perbandaran Manjung</small>
+        </div>
+    </div>
 <div class="header">
     <h1>Dashboard Penguatkuasaan</h1>
     <p>Kebenaran Merancang — Majlis Perbandaran Manjung</p>
