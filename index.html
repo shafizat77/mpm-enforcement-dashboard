@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Penguatkuasaan MPM</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #1f2937;
+}
+
+.header {
+    background: #123b5d;
+    color: white;
+    padding: 22px 30px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.header p {
+    margin: 6px 0 0;
+    opacity: .85;
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+    padding: 25px;
+}
+
+.filters {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.filters h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: white;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.kpi {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.kpi-title {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.kpi-value {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 330px;
+}
+
+#map {
+    height: 500px;
+    border-radius: 10px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    background: #f3f4f6;
+}
+
+.status {
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.expired {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.on-time {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.about {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.loading {
+    text-align: center;
+    padding: 30px;
+}
+
+@media(max-width: 900px) {
+    .filter-grid,
+    .kpi-grid,
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(max-width: 600px) {
+    .filter-grid,
+    .kpi-grid,
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Dashboard Penguatkuasaan</h1>
+    <p>Kebenaran Merancang — Majlis Perbandaran Manjung</p>
+</div>
+
+<div class="container">
+
+<div class="filters">
+    <h2>Penapisan Data</h2>
+
+    <div class="filter-grid">
+
+        <div>
+            <label>Mukim</label>
+            <select id="mukimFilter">
+                <option value="">SEMUA MUKIM</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Status KM</label>
+            <select id="statusFilter">
+                <option value="">SEMUA STATUS</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Kategori</label>
+            <select id="kategoriFilter">
+                <option value="">SEMUA KATEGORI</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Tahun Tamat</label>
+            <select id="tahunFilter">
+                <option value="">SEMUA TAHUN</option>
+            </select>
+        </div>
+
+    </div>
+</div>
+
+<div class="kpi-grid">
+
+    <div class="kpi">
+        <div class="kpi-title">JUMLAH KM</div>
+        <div class="kpi-value" id="total">0</div>
+    </div>
+
+    <div class="kpi">
+        <div class="kpi-title">EXPIRED</div>
+        <div class="kpi-value" id="expired">0</div>
+    </div>
+
+    <div class="kpi">
+        <div class="kpi-title">ON TIME</div>
+        <div class="kpi-value" id="ontime">0</div>
+    </div>
+
+    <div class="kpi">
+        <div class="kpi-title">ABOUT TO EXPIRE</div>
+        <div class="kpi-value" id="about">0</div>
+    </div>
+
+    <div class="kpi">
+        <div class="kpi-title">TIDAK DINYATAKAN</div>
+        <div class="kpi-value" id="unknown">0</div>
+    </div>
+
+</div>
+
+<div class="grid">
+
+    <div class="card">
+        <h3>KM Mengikut Mukim</h3>
+        <div class="chart-container">
+            <canvas id="mukimChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Status KM</h3>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="grid">
+
+    <div class="card">
+        <h3>KM Mengikut Kategori</h3>
+        <div class="chart-container">
+            <canvas id="kategoriChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>KM Mengikut Tahun Tamat</h3>
+        <div class="chart-container">
+            <canvas id="tahunChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="card" style="margin-bottom:20px;">
+    <h3>Peta Lokasi KM</h3>
+    <p>
+        Koordinat yang belum dimasukkan tidak akan dipaparkan sebagai marker.
+    </p>
+    <div id="map"></div>
+</div>
+
+<div class="card">
+
+    <h3>Senarai Rekod KM</h3>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Bil</th>
+                    <th>Lot</th>
+                    <th>Mukim</th>
+                    <th>Kategori</th>
+                    <th>Jenis KM</th>
+                    <th>Tarikh Kelulusan</th>
+                    <th>Tarikh Tamat</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="tableBody"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL = "https://wjxkbgofdbgtzbbggxbq.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_p43Pj4VlbjnwUd47q3FVlg_qyx9Yb62";
+
+const db = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================================================
+   DATA
+   ========================================================= */
+
+let allData = [];
+
+let filteredData = [];
+
+let mukimChart;
+let statusChart;
+let kategoriChart;
+let tahunChart;
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+const map = L.map("map").setView(
+    [4.2, 100.7],
+    10
+);
+
+L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        attribution: "&copy; OpenStreetMap contributors"
+    }
+).addTo(map);
+
+let markers = [];
+
+
+/* =========================================================
+   LOAD DATA
+   ========================================================= */
+
+async function loadData() {
+
+    try {
+
+        const { data, error } = await db
+            .from("km_records")
+            .select("*")
+            .limit(5000);
+
+        if (error) {
+            console.error(error);
+
+            alert(
+                "Gagal membaca data Supabase.\n\n" +
+                error.message
+            );
+
+            return;
+        }
+
+        allData = data || [];
+
+        filteredData = [...allData];
+
+        populateFilters();
+
+        updateDashboard();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Ralat sambungan ke Supabase.");
+
+    }
+
+}
+
+
+/* =========================================================
+   HELPER
+   ========================================================= */
+
+function clean(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ""
+    ) {
+        return "TIDAK DINYATAKAN";
+    }
+
+    return String(value).trim();
+
+}
+
+
+function getMukim(row) {
+
+    return clean(
+        row.mukim_name_import ||
+        row.mukim ||
+        row.nama_mukim
+    );
+
+}
+
+
+function getStatus(row) {
+
+    let status = clean(
+        row.original_status ||
+        row.status_km ||
+        row.status
+    );
+
+    status = status.toUpperCase();
+
+    if (
+        status === "STATUS" ||
+        status === "-"
+    ) {
+        return "TIDAK DINYATAKAN";
+    }
+
+    return status;
+
+}
+
+
+function getKategori(row) {
+
+    return clean(
+        row.category_name ||
+        row.kategori ||
+        row.category ||
+        row.jenis_maklumat
+    );
+
+}
+
+
+function getYear(row) {
+
+    const date =
+        row.expiry_date ||
+        row.tahun_tamat;
+
+    if (!date) return "TIDAK DINYATAKAN";
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) {
+
+        const match =
+            String(date).match(/\d{4}/);
+
+        return match
+            ? match[0]
+            : "TIDAK DINYATAKAN";
+
+    }
+
+    return String(d.getFullYear());
+
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+function uniqueSorted(values) {
+
+    return [...new Set(values)]
+        .filter(v => v)
+        .sort(
+            (a,b) =>
+                String(a).localeCompare(
+                    String(b),
+                    undefined,
+                    {numeric:true}
+                )
+        );
+
+}
+
+
+function populateSelect(
+    elementId,
+    values
+) {
+
+    const select =
+        document.getElementById(elementId);
+
+    const current = select.value;
+
+    while (select.options.length > 1) {
+        select.remove(1);
+    }
+
+    uniqueSorted(values).forEach(value => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = value;
+        option.textContent = value;
+
+        select.appendChild(option);
+
+    });
+
+    select.value = current;
+
+}
+
+
+function populateFilters() {
+
+    populateSelect(
+        "mukimFilter",
+        allData.map(getMukim)
+    );
+
+    populateSelect(
+        "statusFilter",
+        allData.map(getStatus)
+    );
+
+    populateSelect(
+        "kategoriFilter",
+        allData.map(getKategori)
+    );
+
+    populateSelect(
+        "tahunFilter",
+        allData.map(getYear)
+    );
+
+}
+
+
+/* =========================================================
+   APPLY FILTER
+   ========================================================= */
+
+function applyFilters() {
+
+    const mukim =
+        document.getElementById(
+            "mukimFilter"
+        ).value;
+
+    const status =
+        document.getElementById(
+            "statusFilter"
+        ).value;
+
+    const kategori =
+        document.getElementById(
+            "kategoriFilter"
+        ).value;
+
+    const tahun =
+        document.getElementById(
+            "tahunFilter"
+        ).value;
+
+
+    filteredData =
+        allData.filter(row => {
+
+            if (
+                mukim &&
+                getMukim(row) !== mukim
+            ) {
+                return false;
+            }
+
+            if (
+                status &&
+                getStatus(row) !== status
+            ) {
+                return false;
+            }
+
+            if (
+                kategori &&
+                getKategori(row) !== kategori
+            ) {
+                return false;
+            }
+
+            if (
+                tahun &&
+                getYear(row) !== tahun
+            ) {
+                return false;
+            }
+
+            return true;
+
+        });
+
+
+    updateDashboard();
+
+}
+
+
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+function updateDashboard() {
+
+    updateKPI();
+
+    updateCharts();
+
+    updateTable();
+
+    updateMap();
+
+}
+
+
+/* =========================================================
+   KPI
+   ========================================================= */
+
+function updateKPI() {
+
+    const total =
+        filteredData.length;
+
+    let expired = 0;
+    let ontime = 0;
+    let about = 0;
+    let unknown = 0;
+
+
+    filteredData.forEach(row => {
+
+        const status =
+            getStatus(row);
+
+        if (status === "EXPIRED") {
+            expired++;
+        }
+
+        else if (
+            status === "ON TIME" ||
+            status === "ONTIME"
+        ) {
+            ontime++;
+        }
+
+        else if (
+            status.includes("ABOUT")
+        ) {
+            about++;
+        }
+
+        else if (
+            status === "TIDAK DINYATAKAN"
+        ) {
+            unknown++;
+        }
+
+    });
+
+
+    document.getElementById(
+        "total"
+    ).textContent = total;
+
+    document.getElementById(
+        "expired"
+    ).textContent = expired;
+
+    document.getElementById(
+        "ontime"
+    ).textContent = ontime;
+
+    document.getElementById(
+        "about"
+    ).textContent = about;
+
+    document.getElementById(
+        "unknown"
+    ).textContent = unknown;
+
+}
+
+
+/* =========================================================
+   COUNT
+   ========================================================= */
+
+function countBy(
+    rows,
+    callback
+) {
+
+    const result = {};
+
+    rows.forEach(row => {
+
+        const key =
+            callback(row);
+
+        result[key] =
+            (result[key] || 0) + 1;
+
+    });
+
+    return result;
+
+}
+
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+
+function destroyChart(chart) {
+
+    if (chart) {
+        chart.destroy();
+    }
+
+}
+
+
+function updateCharts() {
+
+    const mukim =
+        countBy(
+            filteredData,
+            getMukim
+        );
+
+    const status =
+        countBy(
+            filteredData,
+            getStatus
+        );
+
+    const kategori =
+        countBy(
+            filteredData,
+            getKategori
+        );
+
+    const tahun =
+        countBy(
+            filteredData,
+            getYear
+        );
+
+
+    destroyChart(mukimChart);
+    destroyChart(statusChart);
+    destroyChart(kategoriChart);
+    destroyChart(tahunChart);
+
+
+    mukimChart =
+        new Chart(
+            document.getElementById(
+                "mukimChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+                    labels:
+                        Object.keys(mukim),
+
+                    datasets: [{
+                        label: "Jumlah KM",
+                        data:
+                            Object.values(mukim)
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+
+    statusChart =
+        new Chart(
+            document.getElementById(
+                "statusChart"
+            ),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels:
+                        Object.keys(status),
+
+                    datasets: [{
+                        data:
+                            Object.values(status)
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+
+    kategoriChart =
+        new Chart(
+            document.getElementById(
+                "kategoriChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+                    labels:
+                        Object.keys(kategori),
+
+                    datasets: [{
+                        label: "Jumlah KM",
+                        data:
+                            Object.values(kategori)
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: "y"
+                }
+            }
+        );
+
+
+    tahunChart =
+        new Chart(
+            document.getElementById(
+                "tahunChart"
+            ),
+            {
+                type: "bar",
+
+                data: {
+                    labels:
+                        Object.keys(tahun),
+
+                    datasets: [{
+                        label: "Jumlah KM",
+                        data:
+                            Object.values(tahun)
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            }
+        );
+
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+function updateTable() {
+
+    const body =
+        document.getElementById(
+            "tableBody"
+        );
+
+    body.innerHTML = "";
+
+
+    filteredData.forEach(
+        (row, index) => {
+
+            const tr =
+                document.createElement("tr");
+
+            const status =
+                getStatus(row);
+
+            let statusClass = "";
+
+            if (
+                status === "EXPIRED"
+            ) {
+                statusClass = "expired";
+            }
+
+            else if (
+                status === "ON TIME" ||
+                status === "ONTIME"
+            ) {
+                statusClass = "on-time";
+            }
+
+            else if (
+                status.includes("ABOUT")
+            ) {
+                statusClass = "about";
+            }
+
+
+            tr.innerHTML = `
+
+                <td>${index + 1}</td>
+
+                <td>
+                    ${clean(
+                        row.lot_no ||
+                        row.lot ||
+                        row.no_lot
+                    )}
+                </td>
+
+                <td>
+                    ${getMukim(row)}
+                </td>
+
+                <td>
+                    ${getKategori(row)}
+                </td>
+
+                <td>
+                    ${clean(
+                        row.km_type
+                    )}
+                </td>
+
+                <td>
+                    ${clean(
+                        row.approval_date
+                    )}
+                </td>
+
+                <td>
+                    ${clean(
+                        row.expiry_date
+                    )}
+                </td>
+
+                <td>
+                    <span class="status ${statusClass}">
+                        ${status}
+                    </span>
+                </td>
+
+            `;
+
+            body.appendChild(tr);
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   MAP
+   ========================================================= */
+
+function updateMap() {
+
+    markers.forEach(
+        marker =>
+            map.removeLayer(marker)
+    );
+
+    markers = [];
+
+
+    filteredData.forEach(row => {
+
+        const lat =
+            parseFloat(
+                row.latitude
+            );
+
+        const lng =
+            parseFloat(
+                row.longitude
+            );
+
+
+        if (
+            Number.isFinite(lat) &&
+            Number.isFinite(lng)
+        ) {
+
+            const marker =
+                L.marker([
+                    lat,
+                    lng
+                ]).addTo(map);
+
+
+            marker.bindPopup(`
+
+                <b>KM</b><br>
+
+                Mukim:
+                ${getMukim(row)}<br>
+
+                Lot:
+                ${clean(row.lot_no)}<br>
+
+                Kategori:
+                ${getKategori(row)}<br>
+
+                Status:
+                ${getStatus(row)}
+
+            `);
+
+
+            markers.push(marker);
+
+        }
+
+    });
+
+
+    if (markers.length > 0) {
+
+        const group =
+            L.featureGroup(markers);
+
+        map.fitBounds(
+            group.getBounds(),
+            {
+                padding: [30,30]
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+document.getElementById(
+    "mukimFilter"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "statusFilter"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "kategoriFilter"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+document.getElementById(
+    "tahunFilter"
+).addEventListener(
+    "change",
+    applyFilters
+);
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+loadData();
+
+</script>
+
+</body>
+</html>
