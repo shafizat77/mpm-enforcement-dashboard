@@ -174,8 +174,11 @@ body.admin .admin-only{display:inline-flex}
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <strong>JPB</strong>
-    <span>KAWALAN PEMBAGUNAN</span>
+    <div class="sidebar-brand-logo" title="Letak logo Majlis di sini">
+      <img src="logo-mpm.png" alt="Logo Majlis" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+      <span class="logo-placeholder" style="display:none;">LOGO<br>MPM</span>
+    </div>
+    <div class="sidebar-brand-name">MPM</div>
   </div>
   <button class="menu-item active" onclick="showPage('dashboard',this)">
     <span class="menu-icon">🏠</span><span>Dashboard</span>
