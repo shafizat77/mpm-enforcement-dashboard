@@ -664,6 +664,12 @@ function applyFilters() {
 
     updateDashboard();
 
+    setTimeout(() => {
+    document.getElementById("rekodKM").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}, 300);
 }
 
 
