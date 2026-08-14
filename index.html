@@ -93,7 +93,24 @@ function initMap(){map=L.map("map").setView([4.2,100.7],10);L.tileLayer("https:/
 function updateMap(){if(!map)return;markers.forEach(m=>map.removeLayer(m));markers=[];filteredData.forEach(r=>{const lat=parseFloat(r.latitude),lng=parseFloat(r.longitude);if(Number.isFinite(lat)&&Number.isFinite(lng)){const marker=L.marker([lat,lng]).addTo(map);marker.bindPopup(`<b>Maklumat KM</b><br>Mukim: ${esc(getMukim(r))}<br>Lot: ${esc(getLot(r))}<br>Kategori: ${esc(getKategori(r))}<br>Jenis KM: ${esc(getKmType(r))}<br>Status: ${esc(getStatus(r))}`);markers.push(marker)}});if(markers.length)map.fitBounds(L.featureGroup(markers).getBounds(),{padding:[30,30]})}
 function updateSecondaryCharts(){const m=countBy(filteredData,getMukim),s=countBy(filteredData,getStatus),k=countBy(filteredData,getKategori),t=countBy(filteredData,getYear);destroy(mukimChart2);destroy(statusChart2);destroy(kategoriChart2);destroy(tahunChart2);mukimChart2=new Chart(document.getElementById("mukimChart2"),{type:"bar",data:{labels:Object.keys(m),datasets:[{label:"Jumlah KM",data:Object.values(m)}]},options:opts()});statusChart2=new Chart(document.getElementById("statusChart2"),{type:"doughnut",data:{labels:Object.keys(s),datasets:[{data:Object.values(s)}]},options:opts()});kategoriChart2=new Chart(document.getElementById("kategoriChart2"),{type:"bar",data:{labels:Object.keys(k),datasets:[{label:"Jumlah KM",data:Object.values(k)}]},options:{...opts(),indexAxis:"y"}});tahunChart2=new Chart(document.getElementById("tahunChart2"),{type:"bar",data:{labels:Object.keys(t),datasets:[{label:"Jumlah KM",data:Object.values(t)}]},options:opts()})}
 mukimFilter.addEventListener("change",applyFilters);statusFilter.addEventListener("change",applyFilters);kategoriFilter.addEventListener("change",applyFilters);tahunFilter.addEventListener("change",applyFilters);searchInput.addEventListener("input",applyFilters);
-initMap();loadData();
+initMap();loadData();<script>
+async function testSupabaseConnection() {
+    const { data, error } = await supabaseClient
+        .from('km_records')
+        .select('*')
+        .limit(5);
+
+    if (error) {
+        console.error("SUPABASE ERROR:", error);
+        alert("❌ Sambungan Supabase gagal. Buka Console untuk lihat error.");
+        return;
+    }
+
+    console.log("SUPABASE DATA:", data);
+    alert("✅ Supabase berjaya disambungkan! Data KM berjaya dibaca.");
+}
+
+testSupabaseConnection();
 </script>
 </body>
 </html>
