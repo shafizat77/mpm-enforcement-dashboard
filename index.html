@@ -285,6 +285,46 @@ body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
   .sidebar-brand-name .brand-small{font-size:10px}
   .sidebar-brand-name .brand-large{font-size:19px}
 }
+.enforcement-section{margin:0 0 20px}
+.enforcement-section>h2{margin:0 0 14px;color:#123b5d;font-size:22px}
+.enforcement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.enforcement-card h3{color:#123b5d;margin:0 0 14px}
+.enforcement-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.enforcement-year{background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;padding:14px;text-align:center}
+.enforcement-year strong{display:block;color:#6b7280;font-size:13px}
+.enforcement-value{display:block;font-size:30px;font-weight:800;color:#123b5d;margin-top:5px}
+.enforcement-editor{display:none;margin-top:16px;padding-top:14px;border-top:1px solid #e5e7eb}
+body.admin .enforcement-editor{display:block}
+.enforcement-editor h4{margin:0 0 10px;font-size:14px;color:#374151}
+.enforcement-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.enforcement-inputs label{display:block;font-size:12px;color:#4b5563;margin-bottom:5px}
+.enforcement-actions{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.enforcement-note{font-size:12px;color:#6b7280}
+@media(max-width:768px){.enforcement-grid{grid-template-columns:1fr}}
+.enforcement-accordion-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.enforcement-toggle{width:100%;padding:0;border:0;background:transparent;color:#123b5d;text-align:left;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.enforcement-toggle:hover{color:#0284c7}
+.enforcement-chevron{transition:transform .2s}
+.enforcement-toggle[aria-expanded="true"] .enforcement-chevron{transform:rotate(180deg)}
+.enforcement-accordion-body{margin-top:16px}
+.enforcement-accordion-body .enforcement-values{grid-template-columns:repeat(3,minmax(0,1fr))}
+.enforcement-total{background:#eff6ff;border-color:#bfdbfe}
+.enforcement-total strong,.enforcement-total .enforcement-value{color:#1d4ed8}
+.enforcement-development{margin-top:16px}
+.enforcement-overall-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+.enforcement-overall-grid .enforcement-year{padding:18px}
+.enforcement-complaint-total .enforcement-year{grid-column:1/-1}
+.enforcement-bottom-total{margin-top:16px}
+.enforcement-bottom-total .enforcement-year{grid-column:1/-1}
+.enforcement-mukim-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.enforcement-mukim{background:#f8fafc;border:1px solid #e5e7eb;border-radius:9px;padding:12px}
+.enforcement-mukim h4{margin:0 0 10px;color:#123b5d;font-size:14px}
+.enforcement-mukim .enforcement-value{font-size:22px}
+.enforcement-mukim input{margin-top:10px}
+.enforcement-year-block{margin-top:14px}
+.enforcement-year-block h4{margin:0 0 10px;color:#374151}
+@media(max-width:900px){.enforcement-mukim-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:768px){.enforcement-overall-grid{grid-template-columns:1fr}.enforcement-accordion-grid{grid-template-columns:1fr}.enforcement-accordion-body .enforcement-values{grid-template-columns:repeat(2,minmax(0,1fr))}.enforcement-accordion-body .enforcement-total{grid-column:1/-1}.enforcement-mukim-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 
@@ -317,6 +357,9 @@ body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
   </button>
   <button class="menu-item" onclick="showPage('statistik',this)">
     <span class="menu-icon">📊</span><span>Statistik</span>
+  </button>
+  <button class="menu-item" onclick="showPage('penguatkuasaan',this)">
+    <span class="menu-icon">⚖️</span><span>Penguatkuasaan</span>
   </button>
 </aside>
 
@@ -507,6 +550,72 @@ body.admin .logo-admin-only:hover{border-color:#123b5d;background:#eef5fb}
     </div>
   </section>
 
+  <section id="page-penguatkuasaan" class="page">
+      <div class="page-header" id="enforcementHeading">PENGUATKUASAAN</div>
+    <div class="page-subtitle">Ringkasan aduan dan pemajuan tanpa kebenaran merancang mengikut tahun dan mukim.</div>
+    <div class="container">
+      <section class="enforcement-section" aria-labelledby="enforcementHeading"><div class="enforcement-accordion-grid">
+          <article class="card enforcement-card">
+            <button type="button" class="enforcement-toggle" aria-expanded="false" aria-controls="sispaaDetails" onclick="toggleEnforcementDetails(this,'sispaaDetails')">
+              <span>ADUAN SISPAA</span><span class="enforcement-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="enforcement-accordion-body" id="sispaaDetails" hidden>
+              <div class="enforcement-values">
+                <div class="enforcement-year"><strong>Tahun 2025</strong><span class="enforcement-value" id="sispaa2025">52 kes</span></div>
+                <div class="enforcement-year"><strong>Tahun 2026</strong><span class="enforcement-value" id="sispaa2026">22 kes</span></div>
+                <div class="enforcement-year enforcement-total"><strong>Jumlah keseluruhan</strong><span class="enforcement-value" id="sispaaTotal">74 kes</span></div>
+              </div>
+              <div class="enforcement-editor">
+                <h4>Kemaskini jumlah aduan</h4>
+                <div class="enforcement-inputs">
+                  <div><label for="editSispaa2025">Jumlah 2025</label><input id="editSispaa2025" type="number" min="0" step="1" value="52"></div>
+                  <div><label for="editSispaa2026">Jumlah 2026</label><input id="editSispaa2026" type="number" min="0" step="1" value="22"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="card enforcement-card">
+            <button type="button" class="enforcement-toggle" aria-expanded="false" aria-controls="awamDetails" onclick="toggleEnforcementDetails(this,'awamDetails')">
+              <span>ADUAN AWAM</span><span class="enforcement-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="enforcement-accordion-body" id="awamDetails" hidden>
+              <div class="enforcement-values">
+                <div class="enforcement-year"><strong>Tahun 2025</strong><span class="enforcement-value" id="public2025">9 kes</span></div>
+                <div class="enforcement-year"><strong>Tahun 2026</strong><span class="enforcement-value" id="public2026">12 kes</span></div>
+                <div class="enforcement-year enforcement-total"><strong>Jumlah keseluruhan</strong><span class="enforcement-value" id="publicTotal">21 kes</span></div>
+              </div>
+              <div class="enforcement-editor">
+                <h4>Kemaskini jumlah aduan</h4>
+                <div class="enforcement-inputs">
+                  <div><label for="editPublic2025">Jumlah 2025</label><input id="editPublic2025" type="number" min="0" step="1" value="9"></div>
+                  <div><label for="editPublic2026">Jumlah 2026</label><input id="editPublic2026" type="number" min="0" step="1" value="12"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="enforcement-overall-grid enforcement-complaint-total">
+          <article class="card enforcement-year enforcement-total"><strong>JUMLAH KESELURUHAN ADUAN</strong><span class="enforcement-value" id="allComplaintsTotal">96 kes</span></article>
+        </div>
+        <article class="card enforcement-card enforcement-development">
+          <h3>PEMAJUAN TANPA KEBENARAN MERANCANG</h3>
+          <div id="developmentMukimContent"></div>
+          <div class="enforcement-editor">
+            <h4>Kemaskini jumlah kes mengikut mukim</h4>
+            <p class="enforcement-note">Isi jumlah bagi setiap mukim dan tahun.</p>
+          </div>
+        </article>
+        <div class="enforcement-actions admin-only">
+          <button class="btn btn-primary" type="button" onclick="saveEnforcementSummary()">Simpan jumlah</button>
+          <span class="enforcement-note">Nilai disimpan pada pelayar/peranti ini.</span>
+        </div>
+        <div class="enforcement-overall-grid enforcement-bottom-total">
+          <article class="card enforcement-year enforcement-total"><strong>JUMLAH KESELURUHAN PEMAJUAN TANPA KM</strong><span class="enforcement-value" id="allDevelopmentTotal">35 kes</span></article>
+        </div>
+      </section>
+    </div>
+  </section>
 </div>
 
 <!-- TETAPAN LOGO & TEKS (ADMIN SAHAJA) -->
@@ -893,7 +1002,7 @@ function showPage(name,btn){
 
   document.querySelectorAll(".menu-item").forEach(b=>b.classList.remove("active"));
 
-  const order={dashboard:0,carian:1,senarai:2,peta:3,statistik:4};
+  const order={dashboard:0,carian:1,senarai:2,peta:3,statistik:4,penguatkuasaan:5};
   const buttons=document.querySelectorAll(".menu-item");
 
   if(btn) btn.classList.add("active");
@@ -984,6 +1093,97 @@ function esc(v){
 /* =========================================================
    LOAD DATA
    ========================================================= */
+/* =========================================================
+   RINGKASAN PENGUATKUASAAN
+   Nilai disimpan dalam localStorage pada pelayar/peranti ini.
+   ========================================================= */
+const ENFORCEMENT_STORAGE_KEY="mpm_enforcement_summary_v3";
+const ENFORCEMENT_MUKIMS=["BERUAS","LEKIR","LUMUT","SITIAWAN","PENGKALAN BARU"];
+const ENFORCEMENT_DEFAULTS={sispaa2025:52,sispaa2026:22,public2025:9,public2026:13,...Object.fromEntries([2025,2026].flatMap(year=>ENFORCEMENT_MUKIMS.map(mukim=>`development${year}${mukim.replaceAll(" ","")}`)).map(key=>[key,0])),development2025LUMUT:3,development2025SITIAWAN:6,development2026LEKIR:1,development2026LUMUT:3,development2026SITIAWAN:20,development2026PENGKALANBARU:2};
+let enforcementSummary={...ENFORCEMENT_DEFAULTS};
+
+function readEnforcementSummary(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(ENFORCEMENT_STORAGE_KEY)||"null");
+    if(saved && typeof saved==="object"){
+      Object.keys(ENFORCEMENT_DEFAULTS).forEach(key=>{
+        if(!Object.prototype.hasOwnProperty.call(saved,key)) return;
+        const value=Number(saved[key]);
+        enforcementSummary[key]=Number.isSafeInteger(value)&&value>=0?value:0;
+      });
+    }
+  }catch(e){ enforcementSummary={...ENFORCEMENT_DEFAULTS}; }
+  renderEnforcementSummary();
+}
+
+function toggleEnforcementDetails(button,panelId){
+  const panel=document.getElementById(panelId);
+  const expanded=button.getAttribute("aria-expanded")==="true";
+  button.setAttribute("aria-expanded",String(!expanded));
+  panel.hidden=expanded;
+}
+
+function renderDevelopmentMukims(){
+  const host=document.getElementById("developmentMukimContent");
+  if(!host) return;
+  host.innerHTML=[2025,2026].map(year=>`
+    <div class="enforcement-year-block">
+      <h4>Tahun ${year}</h4>
+      <div class="enforcement-mukim-grid">
+        ${ENFORCEMENT_MUKIMS.map(mukim=>{
+          const suffix=mukim.replaceAll(" ","");
+          const key=`development${year}${suffix}`;
+          const inputId=`edit${key[0].toUpperCase()}${key.slice(1)}`;
+          return `<div class="enforcement-mukim">
+            <h4>${mukim}</h4>
+            <span class="enforcement-value" id="${key}">0 kes</span>
+            <div class="enforcement-editor">
+              <label for="${inputId}">Jumlah kes</label>
+              <input id="${inputId}" type="number" min="0" step="1" value="0">
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function renderEnforcementSummary(){
+  renderDevelopmentMukims();
+  Object.entries(enforcementSummary).forEach(([key,value])=>{
+    const output=document.getElementById(key);
+    const input=document.getElementById("edit"+key[0].toUpperCase()+key.slice(1));
+    if(output) output.textContent=value.toLocaleString("ms-MY")+" kes";
+    if(input) input.value=value;
+  });
+  const sispaaTotal=document.getElementById("sispaaTotal");
+  const publicTotal=document.getElementById("publicTotal");
+  if(sispaaTotal) sispaaTotal.textContent=(enforcementSummary.sispaa2025+enforcementSummary.sispaa2026).toLocaleString("ms-MY")+" kes";
+  if(publicTotal) publicTotal.textContent=(enforcementSummary.public2025+enforcementSummary.public2026).toLocaleString("ms-MY")+" kes";
+  const allComplaintsTotal=document.getElementById("allComplaintsTotal");
+  const allDevelopmentTotal=document.getElementById("allDevelopmentTotal");
+  const complaintsSum=enforcementSummary.sispaa2025+enforcementSummary.sispaa2026+enforcementSummary.public2025+enforcementSummary.public2026;
+  const developmentSum=[2025,2026].flatMap(year=>ENFORCEMENT_MUKIMS.map(mukim=>enforcementSummary[`development${year}${mukim.replaceAll(" ","")}`]||0)).reduce((sum,value)=>sum+value,0);
+  if(allComplaintsTotal) allComplaintsTotal.textContent=complaintsSum.toLocaleString("ms-MY")+" kes";
+  if(allDevelopmentTotal) allDevelopmentTotal.textContent=developmentSum.toLocaleString("ms-MY")+" kes";
+}
+
+function saveEnforcementSummary(){
+  if(!ensureAdmin()) return;
+  const next={};
+  for(const key of Object.keys(ENFORCEMENT_DEFAULTS)){
+    const input=document.getElementById("edit"+key[0].toUpperCase()+key.slice(1));
+    const value=Number(input.value);
+    if(input.value.trim()===""||!Number.isSafeInteger(value)||value<0){
+      alert("Masukkan bilangan bulat 0 atau lebih bagi setiap tahun."); input.focus(); return;
+    }
+    next[key]=value;
+  }
+  try{
+    localStorage.setItem(ENFORCEMENT_STORAGE_KEY,JSON.stringify(next));
+    enforcementSummary=next; renderEnforcementSummary();
+    alert("Jumlah penguatkuasaan berjaya disimpan pada pelayar ini.");
+  }catch(e){ alert("Jumlah tidak dapat disimpan pada pelayar ini."); }
+}
 async function loadData(){
   document.getElementById("searchTable").innerHTML =
     '<div class="loading">Sedang membaca data Supabase...</div>';
@@ -1552,6 +1752,7 @@ document.getElementById("loginPassword").addEventListener("keydown",e=>{
   if(e.key==="Enter") login();
 });
 
+readEnforcementSummary();
 initMap();
 initDashboardArrange();
 initAuth();
